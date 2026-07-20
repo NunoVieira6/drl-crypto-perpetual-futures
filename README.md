@@ -98,5 +98,5 @@ If you use this code or data, please cite the dissertation:
 > Futures Trading*. MSc dissertation, NOVA Information Management School,
 > Universidade NOVA de Lisboa.
 
-A DOI for this repository is provided via Zenodo: (add DOI badge after the first
-GitHub release is archived).
+The archived version of this repository is citable via its Zenodo DOI:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21462215.svg)](https://doi.org/10.5281/zenodo.21462215)
