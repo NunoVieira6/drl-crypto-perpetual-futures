@@ -1,0 +1,133 @@
+{
+  "experiment_name": "thesis_experiment_trainvaltest",
+  "protocol": "train-val-select-test (two-setup grid per algorithm)",
+  "selection_runs": 480,
+  "final_runs": 1200,
+  "selection_wall_clock_seconds": 2810.653911590576,
+  "final_wall_clock_seconds": 5601.984166622162,
+  "total_timesteps_per_run": 50000,
+  "algorithms": [
+    "PPO",
+    "A2C",
+    "RecurrentPPO"
+  ],
+  "targets": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "ALL"
+  ],
+  "seeds": [
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "selection_seed": 42,
+  "ablation_cells": 16,
+  "data_splits": {
+    "train": [
+      "2022-04-08 00:00:00+00:00",
+      "2025-01-31 23:00:00+00:00"
+    ],
+    "validation": [
+      "2025-01-31 23:00:00+00:00",
+      "2025-08-31 23:00:00+00:00"
+    ],
+    "test": [
+      "2025-08-31 23:00:00+00:00",
+      "2026-04-30 16:00:00+00:00"
+    ]
+  },
+  "algo_grids": {
+    "PPO": [
+      {
+        "config_name": "ppo_short_rollout",
+        "learning_rate": 0.00025,
+        "max_grad_norm": 0.5,
+        "n_steps": 512,
+        "batch_size": 128,
+        "n_epochs": 10,
+        "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_range": 0.2,
+        "vf_coef": 0.5,
+        "ent_coef": 0.01,
+        "verbose": 0
+      },
+      {
+        "config_name": "ppo_canonical",
+        "learning_rate": 0.00025,
+        "max_grad_norm": 0.5,
+        "n_steps": 2048,
+        "batch_size": 64,
+        "n_epochs": 10,
+        "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_range": 0.2,
+        "vf_coef": 0.25,
+        "ent_coef": 0.01,
+        "verbose": 0
+      }
+    ],
+    "A2C": [
+      {
+        "config_name": "a2c_sb3_default",
+        "learning_rate": 0.0007,
+        "max_grad_norm": 0.5,
+        "n_steps": 5,
+        "gamma": 0.99,
+        "gae_lambda": 1.0,
+        "vf_coef": 0.25,
+        "ent_coef": 0.01,
+        "verbose": 0
+      },
+      {
+        "config_name": "a2c_mnih_canonical",
+        "learning_rate": 0.0007,
+        "max_grad_norm": 0.5,
+        "n_steps": 5,
+        "gamma": 0.99,
+        "gae_lambda": 1.0,
+        "vf_coef": 0.5,
+        "ent_coef": 0.01,
+        "verbose": 0
+      }
+    ],
+    "RecurrentPPO": [
+      {
+        "config_name": "rppo_short_rollout",
+        "learning_rate": 0.00025,
+        "max_grad_norm": 0.5,
+        "n_steps": 512,
+        "batch_size": 128,
+        "n_epochs": 10,
+        "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_range": 0.2,
+        "vf_coef": 0.5,
+        "ent_coef": 0.01,
+        "lstm_hidden_size": 64,
+        "verbose": 0
+      },
+      {
+        "config_name": "rppo_canonical",
+        "learning_rate": 0.00025,
+        "max_grad_norm": 0.5,
+        "n_steps": 2048,
+        "batch_size": 64,
+        "n_epochs": 10,
+        "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_range": 0.2,
+        "vf_coef": 0.25,
+        "ent_coef": 0.01,
+        "lstm_hidden_size": 64,
+        "verbose": 0
+      }
+    ]
+  },
+  "purge_steps": 96
+}

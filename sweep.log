@@ -1,0 +1,198 @@
+nohup: ignoring input
+Notebook directory: /home/ubuntu/thesis
+Processed panel: /home/ubuntu/thesis/data/processed/aligned_panel_20220101_20260430.csv
+Encoder Option 0 keys: ['activation_fn', 'features_extractor_class', 'features_extractor_kwargs', 'net_arch']
+Encoder Option 1 keys: ['activation_fn', 'features_extractor_class', 'features_extractor_kwargs', 'net_arch']
+
+Option 1 uses FlatMLPExtractor on single-bar observation (drops 96-bar window).
+Both options use net_arch=[64, 64] (SB3 default).
+Test 1 (Option 0 compat):   exposures = [0.25 0.25 0.25 0.25]
+Test 2 (Option 1 scaling):  exposures = [0.75 0.75 0.75 0.75]
+Test 3 (liquidation):       triggered, terminated=True, equity=0.03588
+Test 4 (asset-specific):    exposures = [2.]
+
+All leverage / liquidation smoke tests passed.
+differential_sharpe   reward = -4.133595   (step_return=-0.001056, turnover=1.0000)
+log_return            reward = -0.001056   (expected log(1+-0.001056) = -0.001056)
+log_return_penalized  reward = -0.006056   (log_ret -0.001056 - lambda*turnover 0.005000)
+                                      penalty gap = 0.005000 (= lambda*turnover = 0.005000)
+
+Reward-axis smoke test passed.
+Test 1 (Option 0 full split):  start=95, end=198, length=104
+Test 2 (Option 1 sub-episode): start=129, end=848, length=720
+Test 3 (seed determinism):     same seed 42 -> start=129 both resets
+Test 4 (cross-seed diversity): starts across seeds {5,10,15,20,25} = [353, 393, 453, 438, 289]
+
+Episode-protocol smoke test passed.
+PPO            --  2 setups:
+             config_name='ppo_short_rollout', n_steps=512, vf_coef=0.5, learning_rate=0.00025, ent_coef=0.01
+             config_name='ppo_canonical', n_steps=2048, vf_coef=0.25, learning_rate=0.00025, ent_coef=0.01
+A2C            --  2 setups:
+             config_name='a2c_sb3_default', n_steps=5, vf_coef=0.25, learning_rate=0.0007, ent_coef=0.01
+             config_name='a2c_mnih_canonical', n_steps=5, vf_coef=0.5, learning_rate=0.0007, ent_coef=0.01
+RecurrentPPO   --  2 setups:
+             config_name='rppo_short_rollout', n_steps=512, vf_coef=0.5, learning_rate=0.00025, ent_coef=0.01
+             config_name='rppo_canonical', n_steps=2048, vf_coef=0.25, learning_rate=0.00025, ent_coef=0.01
+Ablation cells:           16  (2^4 = encoder x leverage x reward x episode)
+Algorithms per cell:      3  (PPO, A2C, RecurrentPPO)
+Targets per algorithm:    5  (4 per-asset agents + 1 portfolio agent)
+Setups per algorithm:     2  (two-setup grid -- see ALGO_GRIDS)
+Seeds in final phase:     5  (5, 10, 15, 20, 25)
+
+Selection-phase runs:        480  (1 seed per setup)
+Final-phase runs:          1,200  (winner only)
+Total runs:                1,680
+Total env steps:          84,000,000  (84.0M)
+
+Estimated wall-clock at 50k steps/run:
+  Mac M2     (3 workers):   ~40 hours
+  AWS c7i.4xlarge (8):      ~12-14 hours
+  NOVA DAH1  (20 workers):   ~5-6 hours
+  NOVA DAH2  (80 workers):   ~3-4 hours
+LSTM extractors and FlatMLPExtractor defined.
+AblationCell + factories defined. 16 total cells.
+ALGO_GRIDS exposes 6 setups across 3 algorithms.
+--- PPO  (ppo_short_rollout) ---
+  E0L0R0S0  reward=differential_sharpe       sub_ep=None  L_max=1.0  action_shape=(4,)  params=254,473
+  E0L1R1S1  reward=log_return_penalized      sub_ep=720   L_max=3.0  action_shape=(4,)  params=254,473
+  E1L0R0S0  reward=differential_sharpe       sub_ep=None  L_max=1.0  action_shape=(4,)  params=16,201
+  E1L1R1S1  reward=log_return_penalized      sub_ep=720   L_max=3.0  action_shape=(4,)  params=16,201
+
+--- A2C  (a2c_sb3_default) ---
+  E0L0R0S0  reward=differential_sharpe       sub_ep=None  L_max=1.0  action_shape=(4,)  params=254,473
+  E0L1R1S1  reward=log_return_penalized      sub_ep=720   L_max=3.0  action_shape=(4,)  params=254,473
+  E1L0R0S0  reward=differential_sharpe       sub_ep=None  L_max=1.0  action_shape=(4,)  params=16,201
+  E1L1R1S1  reward=log_return_penalized      sub_ep=720   L_max=3.0  action_shape=(4,)  params=16,201
+
+--- RecurrentPPO  (rppo_short_rollout) ---
+  E0L0R0S0  reward=differential_sharpe       sub_ep=None  L_max=1.0  action_shape=(4,)  params=345,609
+  E0L1R1S1  reward=log_return_penalized      sub_ep=720   L_max=3.0  action_shape=(4,)  params=345,609
+  E1L0R0S0  reward=differential_sharpe       sub_ep=None  L_max=1.0  action_shape=(4,)  params=80,457
+  E1L1R1S1  reward=log_return_penalized      sub_ep=720   L_max=3.0  action_shape=(4,)  params=80,457
+
+Instantiation smoke test passed.
+Feature engineering helpers defined: safe_log_ratio, compute_rsi, add_model_features_one_symbol, add_features_to_panel.
+Will compute 13 feature columns: ['log_close_return', 'open_gap', 'candle_body', 'upper_wick', 'lower_wick', 'candle_range', 'rsi_8', 'macd_8_24_norm', 'cci_8_norm', 'bb_width_8', 'parkinson_volatility_24', 'volume_rel_24h', 'funding_rate']
+Data loading helpers defined: load_panel, slice_panel_dates, build_portfolio_arrays, build_asset_arrays.
+Evaluation helpers defined: evaluate_model.
+select_best_config and train_final_one defined (TrainValTest variant).
+  - selection: train + val separate, 96-hour purge between them.
+  - final:     train+val combined (no internal purge), 96-hour purge before test.
+/home/ubuntu/thesis/Thesis_Experiment_TrainValTest.py:1376: FutureWarning: DataFrameGroupBy.apply operated on the grouping columns. This behavior is deprecated, and in a future version of pandas the grouping columns will be excluded from the operation. Either pass `include_groups=False` to exclude the groupings or explicitly select the grouping columns after groupby to silence this warning.
+  panel = panel.groupby('symbol', group_keys=False).apply(add_model_features_one_symbol)
+Panel loaded: shape=(151536, 30), time range 2022-01-01 00:00:00+00:00 -> 2026-04-30 23:00:00+00:00
+
+Smoke test: cell=E0L0R0S0  algo=PPO  target=BTCUSDT
+             setups in grid: ['ppo_short_rollout', 'ppo_canonical']
+
+[1/2] select_best_config (trains both setups, picks by val Sharpe)...
+  winner: ppo_short_rollout   val_sharpe=-0.7374
+  tuning_rows[0].val_sharpe = -0.7374
+  tuning_rows[1].val_sharpe = -1.5096
+
+[2/2] train_final_one (retrain winner with seed=5)...
+
+Final row:
+  experiment                          = thesis_experiment_trainvaltest
+  cell_id                             = E0L0R0S0
+  encoder                             = LSTM
+  leverage                            = L=1
+  reward                              = diff_sharpe
+  episode                             = sequential
+  algorithm                           = PPO
+  architecture                        = asset
+  target                              = BTCUSDT
+  seed                                = 5
+  config_name                         = ppo_short_rollout
+  train_terminal_equity               = +0.775011
+  train_total_return                  = -0.224989
+  train_annualized_return             = -0.072394
+  train_annualized_vol                = +0.302420
+  train_sharpe_ratio                  = -0.097264
+  train_sortino_ratio                 = -0.121737
+  train_max_drawdown                  = +0.524651
+  train_mean_turnover                 = +0.024819
+  train_total_trading_cost            = +0.504505
+  train_total_funding_cost            = +0.110203
+  train_total_price_pnl               = +0.389719
+  train_n_liquidations                = 0
+  train_mean_abs_exposure             = +0.559834
+  train_std_exposure                  = +0.113270
+  train_mean_signed_exposure          = +0.559834
+  test_terminal_equity                = +0.712350
+  test_total_return                   = -0.287650
+  test_annualized_return              = -0.406020
+  test_annualized_vol                 = +0.271894
+  test_sharpe_ratio                   = -1.779797
+  test_sortino_ratio                  = -2.302759
+  test_max_drawdown                   = +0.395551
+  test_mean_turnover                  = +0.022634
+  test_total_trading_cost             = +0.104900
+  test_total_funding_cost             = +0.010077
+  test_total_price_pnl                = -0.172673
+  test_n_liquidations                 = 0
+  test_mean_abs_exposure              = +0.598759
+  test_std_exposure                   = +0.104837
+  test_mean_signed_exposure           = +0.598759
+  wall_clock_seconds                  = +161.454552
+
+Smoke test passed.
+/home/ubuntu/thesis/Thesis_Experiment_TrainValTest.py:1376: FutureWarning: DataFrameGroupBy.apply operated on the grouping columns. This behavior is deprecated, and in a future version of pandas the grouping columns will be excluded from the operation. Either pass `include_groups=False` to exclude the groupings or explicitly select the grouping columns after groupby to silence this warning.
+  panel = panel.groupby('symbol', group_keys=False).apply(add_model_features_one_symbol)
+[Phase 1] selection -- 240 (cell, algo, target) triples
+           each trains 2 setups with seed=42 (480 total selection runs)
+[Parallel(n_jobs=90)]: Using backend LokyBackend with 90 concurrent workers.
+[Parallel(n_jobs=90)]: Done   1 tasks      | elapsed:  5.4min
+[Parallel(n_jobs=90)]: Done  20 tasks      | elapsed:  7.9min
+[Parallel(n_jobs=90)]: Done  41 tasks      | elapsed: 15.3min
+[Parallel(n_jobs=90)]: Done  86 out of 240 | elapsed: 20.5min remaining: 36.6min
+[Parallel(n_jobs=90)]: Done 111 out of 240 | elapsed: 22.1min remaining: 25.6min
+[Parallel(n_jobs=90)]: Done 136 out of 240 | elapsed: 23.7min remaining: 18.1min
+[Parallel(n_jobs=90)]: Done 161 out of 240 | elapsed: 25.6min remaining: 12.6min
+[Parallel(n_jobs=90)]: Done 186 out of 240 | elapsed: 26.4min remaining:  7.7min
+[Parallel(n_jobs=90)]: Done 211 out of 240 | elapsed: 28.2min remaining:  3.9min
+[Parallel(n_jobs=90)]: Done 236 out of 240 | elapsed: 43.5min remaining:   44.2s
+[Parallel(n_jobs=90)]: Done 240 out of 240 | elapsed: 46.8min finished
+
+[Phase 1] complete: 480 tuning rows in 0.78h -> /home/ubuntu/thesis/artifacts_thesis_experiment_trainvaltest/tables/tuning_log.csv
+
+[Phase 2] final -- 1,200 (cell, algo, target, seed) tuples
+[Parallel(n_jobs=90)]: Using backend LokyBackend with 90 concurrent workers.
+[Parallel(n_jobs=90)]: Done   1 tasks      | elapsed:  3.1min
+[Parallel(n_jobs=90)]: Done  20 tasks      | elapsed:  4.7min
+[Parallel(n_jobs=90)]: Done  41 tasks      | elapsed:  8.0min
+[Parallel(n_jobs=90)]: Done  62 tasks      | elapsed:  8.8min
+[Parallel(n_jobs=90)]: Done  85 tasks      | elapsed: 10.5min
+[Parallel(n_jobs=90)]: Done 108 tasks      | elapsed: 14.7min
+[Parallel(n_jobs=90)]: Done 133 tasks      | elapsed: 15.8min
+[Parallel(n_jobs=90)]: Done 158 tasks      | elapsed: 21.8min
+[Parallel(n_jobs=90)]: Done 185 tasks      | elapsed: 23.8min
+[Parallel(n_jobs=90)]: Done 212 tasks      | elapsed: 26.7min
+[Parallel(n_jobs=90)]: Done 241 tasks      | elapsed: 32.5min
+[Parallel(n_jobs=90)]: Done 270 tasks      | elapsed: 34.9min
+[Parallel(n_jobs=90)]: Done 301 tasks      | elapsed: 37.2min
+[Parallel(n_jobs=90)]: Done 332 tasks      | elapsed: 43.1min
+[Parallel(n_jobs=90)]: Done 365 tasks      | elapsed: 45.7min
+[Parallel(n_jobs=90)]: Done 398 tasks      | elapsed: 51.9min
+[Parallel(n_jobs=90)]: Done 433 tasks      | elapsed: 55.5min
+[Parallel(n_jobs=90)]: Done 468 tasks      | elapsed: 61.2min
+[Parallel(n_jobs=90)]: Done 505 tasks      | elapsed: 65.0min
+[Parallel(n_jobs=90)]: Done 542 tasks      | elapsed: 66.9min
+[Parallel(n_jobs=90)]: Done 581 tasks      | elapsed: 69.0min
+[Parallel(n_jobs=90)]: Done 620 tasks      | elapsed: 71.9min
+[Parallel(n_jobs=90)]: Done 661 tasks      | elapsed: 73.8min
+[Parallel(n_jobs=90)]: Done 702 tasks      | elapsed: 75.8min
+[Parallel(n_jobs=90)]: Done 745 tasks      | elapsed: 77.6min
+[Parallel(n_jobs=90)]: Done 788 tasks      | elapsed: 79.2min
+[Parallel(n_jobs=90)]: Done 833 tasks      | elapsed: 80.3min
+[Parallel(n_jobs=90)]: Done 878 tasks      | elapsed: 81.6min
+[Parallel(n_jobs=90)]: Done 925 tasks      | elapsed: 83.7min
+[Parallel(n_jobs=90)]: Done 972 tasks      | elapsed: 84.5min
+[Parallel(n_jobs=90)]: Done 1021 tasks      | elapsed: 85.8min
+[Parallel(n_jobs=90)]: Done 1142 out of 1200 | elapsed: 88.9min remaining:  4.5min
+[Parallel(n_jobs=90)]: Done 1200 out of 1200 | elapsed: 93.4min finished
+
+[Phase 2] complete: 1,200 runs in 1.56h -> /home/ubuntu/thesis/artifacts_thesis_experiment_trainvaltest/tables/summary_ablation.csv
+
+Wrote /home/ubuntu/thesis/artifacts_thesis_experiment_trainvaltest/manifests/manifest.json
+aggregate_results() defined. Call after the sweep completes.
